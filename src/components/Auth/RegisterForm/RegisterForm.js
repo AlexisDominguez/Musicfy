@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Icon, Form, Input } from "semantic-ui-react";
+import { toast } from "react-toastify";
 import { validateEmail } from "../../../utils/Validations";
 import firebase from "../../../utils/Firebase";
 import "firebase/auth";
@@ -36,8 +37,31 @@ export default function RegisterForm(props) {
     setFormError(errors);
 
     if (formOk) {
-      console.log("Formulario VALIDO");
+      setIsLoading(true);
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(formData.email, formData.password)
+        .then(() => {
+          toast.success("Registrado correctamente.");
+          changeUserName();
+        })
+        .catch(() => toast.error("Error al registrar usuario"))
+        .finally(() => {
+          setIsLoading(false);
+          setSelectedForm(null);
+        });
     }
+  };
+
+  const changeUserName = () => {
+    firebase
+      .auth()
+      .currentUser.updateProfile({
+        displayName: formData.username,
+      })
+      .catch(() => {
+        toast.error("Error al asignar nombre de usuario.");
+      });
   };
 
   const handlerShowPassword = () => {
@@ -105,7 +129,9 @@ export default function RegisterForm(props) {
             <span className="error-text">Introduce un nombre de usuario.</span>
           )}
         </Form.Field>
-        <Button type="submit">Continuar</Button>
+        <Button type="submit" loading={isLoading}>
+          Continuar
+        </Button>
         <div className="register-form__options">
           <p onClick={() => setSelectedForm(null)}>Volver</p>
           <p>
