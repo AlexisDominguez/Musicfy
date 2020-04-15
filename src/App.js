@@ -9,13 +9,12 @@ function App() {
   const [isloading, setIsLoading] = useState(true); // Controla si la página está cargando o no
 
   firebase.auth().onAuthStateChanged((currentUser) => {
-    if (!currentUser) {
+    if (!currentUser?.emailVerified) {
+      firebase.auth().signOut();
       setUser(null);
     } else {
       setUser(currentUser);
-      console.log(currentUser);
     }
-
     setIsLoading(false);
   });
 

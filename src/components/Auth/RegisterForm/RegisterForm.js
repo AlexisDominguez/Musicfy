@@ -42,8 +42,8 @@ export default function RegisterForm(props) {
         .auth()
         .createUserWithEmailAndPassword(formData.email, formData.password)
         .then(() => {
-          toast.success("Registrado correctamente.");
           changeUserName();
+          sendVerificationEmail();
         })
         .catch(() => toast.error("Error al registrar usuario"))
         .finally(() => {
@@ -73,6 +73,18 @@ export default function RegisterForm(props) {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const sendVerificationEmail = () => {
+    firebase
+      .auth()
+      .currentUser.sendEmailVerification()
+      .then(() => {
+        toast.success("Se ha enviado un email de verificación.");
+      })
+      .catch(() => {
+        toast.error("Error al enviar correo de verificación.");
+      });
   };
 
   return (
